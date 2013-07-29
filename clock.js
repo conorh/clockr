@@ -285,15 +285,7 @@
     }
   };
 
-  function setTime() {
-    var now = new Date();
-    var time = now.getMinutes().toString() + ":" + now.getSeconds().toString()
-    setCharacters(clocks, time);
-    animationLoop();
-  }
-
   var clocks = createClocks(8, 8*6+2);
-  setTime();
 
   setInterval(function() {
     var now = new Date();
