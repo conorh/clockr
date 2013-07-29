@@ -3,6 +3,14 @@
   var ticks = 0;
 
   var characterMap = {
+    " ": [
+        ["  ", "  ", "  ", "  ", "  "],
+        ["  ", "  ", "  ", "  ", "  "],
+        ["  ", "  ", "  ", "  ", "  "],
+        ["  ", "  ", "  ", "  ", "  "],
+        ["  ", "  ", "  ", "  ", "  "],
+        ["  ", "  ", "  ", "  ", "  "],
+    ],
     ":": [
         ["  ", ",>", "<>", "<,", "  "],
         ["  ", ",^", "  ", ",^", "  "],
@@ -285,11 +293,20 @@
     }
   };
 
-  var clocks = createClocks(8, 8*6+2);
+  var clocks = createClocks(10, 8*6+2);
+
+  function zeroPad(h) {
+    return (h < 10) ? ("0" + h) : h;
+  }
 
   setInterval(function() {
     var now = new Date();
-    var time = now.getHours().toString() + ":" + now.getMinutes().toString() + ":" + now.getSeconds().toString()
+    var seconds = now.getSeconds();
+    var hours = now.getHours();
+    if(hours < 10) {
+      hours = " " + hours;
+    }
+    var time = hours + ":" + zeroPad(now.getMinutes()) + ":" + zeroPad(now.getSeconds());
     setCharacters(clocks, time);
     ticks = 0;
     animationLoop();
