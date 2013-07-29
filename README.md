@@ -4,7 +4,8 @@ Inspired by http://www.reddit.com/r/gifs/comments/1j9ush/digital_clock_comprised
 
 see http://squaremill.com/clockr/index.html
 
-Notes: There are bugs, it is not finished this was a short afternoon work and I've never done JS canvas animations before!
+Notes: 
+* There are bugs. This is a few hours work in an area I'm unfamiliar with (js canvas animations).
 
 TODO:
 * I want the clocks to animate more as in the art exhibit.
