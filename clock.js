@@ -1,5 +1,5 @@
 (function() {
-  var totalTicks = 60 * 0.5;
+  var totalTicks = 25;
   var ticks = 0;
 
   var characterMap = {
