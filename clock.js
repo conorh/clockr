@@ -311,11 +311,11 @@
   };
 
   var clocks = createClocks(6, 8*6-1);
- // window.addEventListener('resize', function() {
- //   canvas.width = window.innerWidth;
- //   canvas.height = window.innerHeight;
- //   clocks = createClocks(6, 8*6-1);
- // }, false);
+  window.addEventListener('resize', function() {
+    canvas.width = window.innerWidth - 20;
+    canvas.height = window.innerHeight;
+    clocks = createClocks(6, 8*6-1);
+  }, false);
 
   function zeroPad(h) {
     return (h < 10) ? ("0" + h) : h;
