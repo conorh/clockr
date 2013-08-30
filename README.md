@@ -1,16 +1,14 @@
-== JS Clock
+Javascript Canvas Clock of Clocks
+=================================
 
-Inspired by http://www.reddit.com/r/gifs/comments/1j9ush/digital_clock_comprised_of_analog_clocks/ which came from http://humanssince1982.com/
+A canvas animation of a clock made up of smaller 'clocks'.
 
 see http://squaremill.com/clockr/index.html
 
-Notes: 
-* There are bugs. This is a few hours work in an area I'm unfamiliar with (js canvas animations).
+Originally inspired by http://www.reddit.com/r/gifs/comments/1j9ush/digital_clock_comprised_of_analog_clocks/ which came from http://humanssince1982.com/
 
-TODO:
-* I want the clocks to animate more as in the art exhibit.
-
-== License
+License
+-------
 
 The MIT License (MIT)
 
