@@ -395,7 +395,7 @@
 
   var e = document.getElementById("update-speed");
   e.addEventListener('change', function(event) {
-    updateInterval = event.currentTarget.value * 1000.0;
+    updateInterval = (10 - event.currentTarget.value) * 1000.0;
     cancel = true;
     clearInterval(timer);
     timer = setInterval(updateTime, updateInterval);
