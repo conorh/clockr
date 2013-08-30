@@ -589,7 +589,7 @@
 
   // Every second update the display with the new time
   function updateTime() {
-    var now = new Date(); 
+    var now = new Date (new Date().getTime() + updateInterval);
     var seconds = now.getSeconds();
     var hours = now.getHours();
     if(hours < 10) {
