@@ -147,7 +147,7 @@
       }
       
       // Return true if the clock hand positions changed
-      return (this.hand1Rad !== t1 && this.hand2Rand !== t2)
+      return this.hand1Rad !== t1 || this.hand2Rand !== t2
     },
     animateHand1: function(rad) {
       this.hand1EndRad = rad;
@@ -287,10 +287,9 @@
               hand2Pos = getHandPos(pos.charAt(1));
               clock.animateHand1(hand1Pos);
               clock.animateHand2(hand2Pos);
-              clock.hidden = false;
             } else {
-              clock.hide(canvasContext);
-              clock.hidden = true;
+              clock.animateHand1(hand1Pos);
+              clock.animateHand2(hand2Pos);
             }
           }
         }
