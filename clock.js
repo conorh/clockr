@@ -1,5 +1,5 @@
 (function() {
-  var updateInterval = 3000.0;
+  var updateInterval = 2000.0;
   var clocks = null;
   var canvas = document.getElementById('clock');
   var canvasContext = canvas.getContext('2d');
