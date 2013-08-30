@@ -232,15 +232,15 @@
   }
 
   // Create a matrix of clocks
-  function createClocks(yCount, reqXCount) {
+  function createClocks(yCount, reqXCount, canvasWidth, canvasHeight) {
     // Split screen up into squares
-    var height = canvas.height / yCount;
-    var width = (canvas.width - 20) / reqXCount;
+    var height = canvasHeight / yCount;
+    var width = (canvasWidth - 20) / reqXCount;
     if(height > width) {
       height = width;
     }
     var radius = height / 2.0;
-    var xCount = Math.floor(canvas.width / height);
+    var xCount = Math.floor(canvasWidth / height);
     if(xCount > reqXCount) {
       xCount = reqXCount
     }
@@ -347,10 +347,25 @@
 
   // Setup the clocks on the canvas and make sure to reset up whenever there
   // is a window resize event
-  function setupCanvas() {
+  function setupCanvas() {can
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    clocks = createClocks(6, 8*5);
+        var devicePixelRatio = window.devicePixelRatio || 1
+        var backingStoreRatio = canvasContext.webkitBackingStorePixelRatio ||
+                            canvasContext.mozBackingStorePixelRatio ||
+                            canvasContext.msBackingStorePixelRatio ||
+                            canvasContext.oBackingStorePixelRatio ||
+                            canvasContext.backingStorePixelRatio || 1
+
+        var ratio = devicePixelRatio / backingStoreRatio;
+    if (devicePixelRatio !== backingStoreRatio) {
+      canvas.width = canvas.width * ratio;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.height = canvas.height * ratio;
+      canvas.style.height = window.innerHeight + "px";
+      canvasContext.scale(ratio, ratio);   
+    }
+    clocks = createClocks(6, 8*5, window.innerWidth, window.innerHeight);
   }
   setupCanvas();
   window.addEventListener('resize', setupCanvas, false);
