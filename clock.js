@@ -1,4 +1,8 @@
 (function() {
+  var clocks = null;
+  var canvas = document.getElementById('clock');
+  var canvasContext = canvas.getContext('2d');
+
   var characterMap = {
     " ": [
         ["  ", "  ", "  ", "  ", "  "],
@@ -9,28 +13,28 @@
         ["  ", "  ", "  ", "  ", "  "],
     ],
     ":": [
-        ["  ", ",>", "<>", "<,", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", "^>", "<>", "<^", "  "],
-        ["  ", ",>", "<>", "<,", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", "^>", "<>", "<^", "  "],
+        ["**", ",>", "<>", "<,", "**"],
+        ["**", ",^", "**", ",^", "**"],
+        ["**", "^>", "<>", "<^", "**"],
+        ["**", ",>", "<>", "<,", "**"],
+        ["**", ",^", "**", ",^", "**"],
+        ["**", "^>", "<>", "<^", "**"],
     ],
     "0": [ 
         [",>", "<>", "<>", "<>", "<,"],
         [",^", ",>", "<>", "<,", ",^"],
-        [",^", ",^", "  ", ",^", ",^"],
-        [",^", ",^", "  ", ",^", ",^"],
+        [",^", ",^", "**", ",^", ",^"],
+        [",^", ",^", "**", ",^", ",^"],
         [",^", "^>", "<>", "<^", ",^"],
         ["^>", "<>", "<>", "<>", "<^"]
       ],
-    "1": [ 
-        ["  ", ",>", "<>", "<,", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", ",^", "  ", ",^", "  "],
-        ["  ", "^>", "<>", "<^", "  "]
+   "1": [ 
+        ["**", ",>", "<>", "<,", "**"],
+        ["**", "^>", "<,", ",^", "**"],
+        ["**", "**", ",^", ",^", "**"],
+        ["**", "**", ",^", ",^", "**"],
+        ["**", ",>", "<^", "^>", "<,"],
+        ["**", "^>", "<>", "<>", "<^"]
       ],
     "2": [ 
         [",>", "<>", "<>", "<>", "<,"],
@@ -43,18 +47,18 @@
     "3": [ 
         [",>", "<>", "<>", "<>", "<,"],
         ["^>", "<>", "<>", "<,", ",^"],
-        ["  ", ",>", "<>", "<^", ",^"],
-        ["  ", "^>", "<>", "<,", ",^"],
+        ["**", ",>", "<>", "<^", ",^"],
+        ["**", "^>", "<>", "<,", ",^"],
         [",>", "<>", "<>", "<^", "^,"],
         ["^>", "<>", "<>", "<>", "<^"]
       ],
     "4": [ 
-        [",>", "<,", "  ", ",>", "<,"],
-        [",^", ",^", "  ", ",^", ",^"],
+        [",>", "<,", "**", ",>", "<,"],
+        [",^", ",^", "**", ",^", ",^"],
         [",^", "^>", "<>", "<^", ",^"],
         ["^>", "<>", "<>", "<,", ",^"],
-        ["  ", "  ", "  ", ",^", ",^"],
-        ["  ", "  ", "  ", "^>", "<^"]
+        ["**", "**", "**", ",^", ",^"],
+        ["**", "**", "**", "^>", "<^"]
       ],
     "5": [ 
         [",>", "<>", "<>", "<>", "<,"],
@@ -75,10 +79,10 @@
     "7": [ 
         [",>", "<>", "<>", "<>", "<,"],
         ["^>", "<>", "<>", "<,", ",^"],
-        ["  ", "  ", "  ", ",^", ",^"],
-        ["  ", "  ", "  ", ",^", ",^"],
-        ["  ", "  ", "  ", ",^", ",^"],
-        ["  ", "  ", "  ", "^>", "<^"],
+        ["**", "**", "**", ",^", ",^"],
+        ["**", "**", "**", ",^", ",^"],
+        ["**", "**", "**", ",^", ",^"],
+        ["**", "**", "**", "^>", "<^"],
       ],
     "8": [ 
         [",>", "<>", "<>", "<>", "<,"],
@@ -93,8 +97,8 @@
         ["^,", ",>", "<>", "<,", ",^"],
         ["^,", "^>", "<>", "<^", ",^"],
         ["^>", "<>", "<>", "<,", ",^"],
-        ["  ", "  ", "  ", ",^", ",^"],
-        ["  ", "  ", "  ", "^>", "<^"],
+        ["**", "**", "**", ",^", ",^"],
+        ["**", "**", "**", "^>", "<^"],
       ]
     }
 
@@ -108,12 +112,8 @@
             };
   })();
 
-  var canvas = document.getElementById('clock');
-  canvas.width = window.innerWidth - 20;
-  canvas.height = window.innerHeight;
-  var canvasContext = canvas.getContext('2d');
-
   var clockObj = {
+    hidden: false,
     hand1Rad: 0.0,
     hand1EndRad: 0.0,
     hand1StartRad: 0.0,
@@ -126,7 +126,10 @@
     hand2Direction: 1,
     centerX: 0.0,
     centerY: 0.0,
+    originalRadius: 0.0,
     radius: 0.0,
+    startRadius: 0.0,
+    difRadius: 0.0,
     tick: function(percentageComplete) {
       var t1 = this.hand1Rad;
       var t2 = this.hand2Rad;
@@ -135,14 +138,26 @@
       if(this.precentageComplete >= 1.0) {
         this.hand1Rad = this.hand1EndRad;
         this.hand2Rad = this.hand2EndRad;
+        this.radius = this.endRadius;
       } else {
         // Calculate the new hand positions given the percentage of animation complete
-        this.hand1Rad = this.hand1StartRad + (this.hand1DifRad * percentageComplete)
-        this.hand2Rad = this.hand2StartRad + (this.hand2DifRad * percentageComplete)
+        this.hand1Rad = this.hand1StartRad + (this.hand1DifRad * percentageComplete);
+        this.hand2Rad = this.hand2StartRad + (this.hand2DifRad * percentageComplete);
+        if(this.difRadius !== 0) {
+          this.radius = this.startRadius + (this.difRadius * percentageComplete);
+        }
       }
       
       // Return true if the clock hand positions changed
-      return this.hand1Rad !== t1 || this.hand2Rand !== t2
+      return this.hand1Rad !== t1 || this.hand2Rand !== t2;
+    },
+    animateRadius: function(radius) {
+      this.startRadius = this.radius;
+      this.endRadius = radius;
+      this.difRadius = this.endRadius - this.startRadius;
+    },
+    setHand1Pos: function(rad) {
+      this.hand1EndRad = this.hand1StartRad = this.hand1Rad = rad;
     },
     animateHand1: function(rad) {
       // Calculate the difference in radians from the current posistion to new position
@@ -155,6 +170,9 @@
       }
 
       this.hand1DifRad = dif;
+    },
+    setHand2Pos: function(rad) {
+      this.hand2EndRad = this.hand2StartRad = this.hand2Rad = rad;
     },
     animateHand2: function(rad) {
       // Calculate the difference in radians from the current posistion to new position
@@ -174,12 +192,14 @@
       var hand1Rad = this.hand1Rad;
       var hand2Rad = this.hand2Rad;
 
-      var topLeftX = centerX - radius;
-      var topLeftY = centerY - radius;
-
       // Fill in the background white
+      var topLeftX = centerX - this.originalRadius;
+      var topLeftY = centerY - this.originalRadius;
       ctx.fillStyle='white';
-      ctx.fillRect(topLeftX, topLeftY, radius*2.0, radius*2.0);
+      ctx.fillRect(topLeftX, topLeftY, this.originalRadius*2.0, this.originalRadius*2.0);
+      if(this.hidden && this.endRadius === this.radius) {
+        return;
+      }
 
       // Draw a small black circle in the center
       //ctx.beginPath();
@@ -214,7 +234,7 @@
   function createClocks(yCount, xCount) {
     // Split screen up into squares
     var height = canvas.height / yCount;
-    var width = canvas.width / xCount;
+    var width = (canvas.width - 20) / xCount;
     if(height > width) {
       height = width;
     }
@@ -227,9 +247,9 @@
       for(var j=0;j<yCount;j++) {
         // Create a clock for for each grid entry
         var clock = Object.create(clockObj);
-        clock.radius = radius;
-        clock.centerX = (i * width) + radius + 10;
-        clock.centerY = (j * height) + radius + 10;
+        clock.originalRadius = clock.radius = radius;
+        clock.centerX = (i * width) + radius;
+        clock.centerY = (j * height) + radius;
         matrix[i][j] = clock;
       }
     }
@@ -265,20 +285,30 @@
             var clock = clocks[k + topLeftX][j];
             var pos = c[j][k];
             // Set the final position for each hand of the clock for this animation
-            var hand1Pos = 0.0;
-            var hand2Pos = 1 * Math.PI;
-            if(pos != "  ") { 
-              hand1Pos = getHandPos(pos.charAt(0));
-              hand2Pos = getHandPos(pos.charAt(1));
+            
+            if(pos == "**") {
+              clock.animateHand1(0.0);
+              clock.animateHand2(1 * Math.PI);
+              clock.animateRadius(0);
+              clock.hidden = true;
+            } else if(pos == "  ") {
+              // Set the hands to the default position if no position specified
+              clock.animateHand1(0.0);
+              clock.animateHand2(1 * Math.PI);
+              clock.animateRadius(clock.originalRadius);
+              clock.hidden = false;
+            } else {
+              // Set end position for hands
+              var hand1Pos = getHandPos(pos.charAt(0));
+              var hand2Pos = getHandPos(pos.charAt(1));
               clock.animateHand1(hand1Pos);
               clock.animateHand2(hand2Pos);
-            } else {
-              clock.animateHand1(hand2Pos);
-              clock.animateHand2(hand1Pos);
+              clock.animateRadius(clock.originalRadius);
+              clock.hidden = false;
             }
           }
         }
-        topLeftX += c.length;
+        topLeftX += c.length-1;
       }
     }
   }
@@ -299,6 +329,7 @@
     }
   }
 
+  // Main animation loop, takes 500ms to do one animation
   var animStartTime = 0;
   function animationLoop() {
     var diff = new Date() - animStartTime;
@@ -306,20 +337,19 @@
       requestAnimFrame(animationLoop);
       drawClocks(clocks, diff / 500.0);
     } else {
-      drawClocks(clocks, 1.0);
+     drawClocks(clocks, 1.0);
     }
   };
 
-  var clocks = createClocks(6, 8*6-1);
-  window.addEventListener('resize', function() {
-    canvas.width = window.innerWidth - 20;
+  // Setup the clocks on the canvas and make sure to reset up whenever there
+  // is a window resize event
+  function setupCanvas() {
+    canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    clocks = createClocks(6, 8*6-1);
-  }, false);
-
-  function zeroPad(h) {
-    return (h < 10) ? ("0" + h) : h;
+    clocks = createClocks(6, 8*5);
   }
+  setupCanvas();
+  window.addEventListener('resize', setupCanvas, false);
 
   // Every second update the display with the new time
   setInterval(function() {
@@ -329,6 +359,7 @@
     if(hours < 10) {
       hours = " " + hours;
     }
+    function zeroPad(h) { return (h < 10) ? ("0" + h) : h; }
     var timeString = hours + ":" + zeroPad(now.getMinutes()) + ":" + zeroPad(now.getSeconds());
     setCharacters(clocks, timeString);
     animStartTime = new Date();
