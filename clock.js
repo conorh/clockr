@@ -1,4 +1,5 @@
 (function() {
+  var updateInterval = 3000.0;
   var clocks = null;
   var canvas = document.getElementById('clock');
   var canvasContext = canvas.getContext('2d');
@@ -335,29 +336,33 @@
 
   // Main animation loop, takes 500ms to do one animation
   var animStartTime = 0;
+  var cancel = false;
   function animationLoop() {
+    if(cancel) { return }
     var diff = new Date() - animStartTime;
-    if(diff < 500) {
+    if(diff < updateInterval - 500) {
       requestAnimFrame(animationLoop);
-      drawClocks(clocks, diff / 500.0);
+      drawClocks(clocks, diff / (updateInterval - 500));
     } else {
-     drawClocks(clocks, 1.0);
+      drawClocks(clocks, 1.0);
     }
   };
 
   // Setup the clocks on the canvas and make sure to reset up whenever there
   // is a window resize event
-  function setupCanvas() {can
+  function setupCanvas() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-        var devicePixelRatio = window.devicePixelRatio || 1
-        var backingStoreRatio = canvasContext.webkitBackingStorePixelRatio ||
-                            canvasContext.mozBackingStorePixelRatio ||
-                            canvasContext.msBackingStorePixelRatio ||
-                            canvasContext.oBackingStorePixelRatio ||
-                            canvasContext.backingStorePixelRatio || 1
 
-        var ratio = devicePixelRatio / backingStoreRatio;
+    // Account for retina devices
+    var devicePixelRatio = window.devicePixelRatio || 1
+    var backingStoreRatio = canvasContext.webkitBackingStorePixelRatio ||
+                        canvasContext.mozBackingStorePixelRatio ||
+                        canvasContext.msBackingStorePixelRatio ||
+                        canvasContext.oBackingStorePixelRatio ||
+                        canvasContext.backingStorePixelRatio || 1
+
+    var ratio = devicePixelRatio / backingStoreRatio;
     if (devicePixelRatio !== backingStoreRatio) {
       canvas.width = canvas.width * ratio;
       canvas.style.width = window.innerWidth + "px";
@@ -371,7 +376,7 @@
   window.addEventListener('resize', setupCanvas, false);
 
   // Every second update the display with the new time
-  setInterval(function() {
+  function updateTime() {
     var now = new Date(); 
     var seconds = now.getSeconds();
     var hours = now.getHours();
@@ -383,5 +388,18 @@
     setCharacters(clocks, timeString);
     animStartTime = new Date();
     animationLoop();
-  }, 1000);
+  }
+
+  var timer = setInterval(updateTime, updateInterval);
+  updateTime();
+
+  var e = document.getElementById("update-speed");
+  e.addEventListener('change', function(event) {
+    updateInterval = event.currentTarget.value * 1000.0;
+    cancel = true;
+    clearInterval(timer);
+    timer = setInterval(updateTime, updateInterval);
+    cancel = false; // Will not always work :)
+    updateTime();
+  }, false);
 })();

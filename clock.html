@@ -4,10 +4,33 @@
   <style>
     html, body { width:100%; height:100%; margin: 0; padding: 0; border: 0;}
     canvas {  display:block; }
+
+    input[type="range"] {
+        -webkit-appearance: none;
+        background-color: black;
+        height: 2px;
+        width: 50%;
+        margin: 20px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        position: relative;
+        top: -1px;
+        z-index: 1;
+        width: 11px;
+        height: 11px;
+     
+        -webkit-border-radius: 40px;
+        -moz-border-radius: 40px;
+        border-radius: 40px;
+        background-image: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#ebf1f6), color-stop(50%,#abd3ee), color-stop(51%,#89c3eb), color-stop(100%,#d5ebfb));
+    }
   </style>
 </head>
 <body>
-  <canvas id="clock" style="padding-top: 50px; margin: 0; padding 0; border: 0;"></canvas>
+  <center><input type="range" id="update-speed" min="1" max="10" step="1" value="3"></center>
+  <canvas id="clock"></canvas>
   <script src="clock.js"></script>
 </body>
 </html>
