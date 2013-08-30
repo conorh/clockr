@@ -109,25 +109,19 @@
   })();
 
   var canvas = document.getElementById('clock');
-  canvas.width = window.innerWidth;
+  canvas.width = window.innerWidth - 20;
   canvas.height = window.innerHeight;
   var canvasContext = canvas.getContext('2d');
 
-  window.addEventListener('resize', function() {
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-  }, false);
-
   var clockObj = {
-    hidden: false,
     hand1Rad: 0.0,
     hand1EndRad: 0.0,
     hand1StartRad: 0.0,
     hand1DifRad: 0.0,
     hand1Direction: 1,
-    hand2Rad: 0.0,
-    hand2StartRad: 0.0,
-    hand2EndRad: 0.0,
+    hand2Rad: 1 * Math.PI,
+    hand2StartRad: 1 * Math.PI,
+    hand2EndRad: 1 * Math.PI,
     hand2DifRad: 0.0,
     hand2Direction: 1,
     centerX: 0.0,
@@ -142,6 +136,7 @@
         this.hand1Rad = this.hand1EndRad;
         this.hand2Rad = this.hand2EndRad;
       } else {
+        // Calculate the new hand positions given the percentage of animation complete
         this.hand1Rad = this.hand1StartRad + (this.hand1DifRad * percentageComplete)
         this.hand2Rad = this.hand2StartRad + (this.hand2DifRad * percentageComplete)
       }
@@ -150,6 +145,7 @@
       return this.hand1Rad !== t1 || this.hand2Rand !== t2
     },
     animateHand1: function(rad) {
+      // Calculate the difference in radians from the current posistion to new position
       this.hand1EndRad = rad;
       this.hand1StartRad = this.hand1Rad;
 
@@ -157,9 +153,11 @@
       if(this.hand1Direction < 0) {
         dif = -((Math.PI * 2) - dif);
       }
+
       this.hand1DifRad = dif;
     },
     animateHand2: function(rad) {
+      // Calculate the difference in radians from the current posistion to new position
       this.hand2EndRad = rad;
       this.hand2StartRad = this.hand2Rad;
 
@@ -169,19 +167,7 @@
       }
       this.hand2DifRad = dif;
     },
-    hide: function(ctx) {
-      var centerX = this.centerX;
-      var centerY = this.centerY;
-      var radius = this.radius;
-      var topLeftX = centerX - radius;
-      var topLeftY = centerY - radius;
-      ctx.fillStyle='white';
-      ctx.fillRect(topLeftX, topLeftY, radius*2.0, radius*2.0);
-    },
     render: function(ctx) {
-      if(this.hidden) {
-        return;
-      }
       var centerX = this.centerX;
       var centerY = this.centerY;
       var radius = this.radius;
@@ -196,10 +182,10 @@
       ctx.fillRect(topLeftX, topLeftY, radius*2.0, radius*2.0);
 
       // Draw a small black circle in the center
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, radius / 14.0, 0, 2 * Math.PI, false);
-      ctx.fillStyle = 'black';
-      ctx.fill();
+      //ctx.beginPath();
+      //ctx.arc(centerX, centerY, radius / 14.0, 0, 2 * Math.PI, false);
+      //ctx.fillStyle = 'black';
+      //ctx.fill();
 
       // Draw the hands at the positions required
       ctx.beginPath()
@@ -268,7 +254,6 @@
   // the characters specified
   function setCharacters(clocks, chars) {
     var topLeftX = 0;
-    var topLeftY = 2;
     var xCount = clocks.length;
 
     // Loop over each character to be rendered
@@ -277,7 +262,7 @@
       if(c) {
         for(var j=0;j<c.length;j++) {
           for(var k=0;k<c[j].length;k++) {
-            var clock = clocks[topLeftX + k][topLeftY + j];
+            var clock = clocks[k + topLeftX][j];
             var pos = c[j][k];
             // Set the final position for each hand of the clock for this animation
             var hand1Pos = 0.0;
@@ -288,19 +273,12 @@
               clock.animateHand1(hand1Pos);
               clock.animateHand2(hand2Pos);
             } else {
-              clock.animateHand1(hand1Pos);
-              clock.animateHand2(hand2Pos);
+              clock.animateHand1(hand2Pos);
+              clock.animateHand2(hand1Pos);
             }
           }
         }
         topLeftX += c.length;
-      } else {
-        // If there is no clock at this position then set the position
-        // of the clock hand to a random point
-        //var hand1Pos = (Math.PI * 2) * Math.random();
-        //var hand2Pos = (Math.PI * 2) * Math.random();
-        //clock.animateHand1(hand1Pos);
-        //clock.animateHand2(hand2Pos);       
       }
     }
   }
@@ -332,7 +310,12 @@
     }
   };
 
-  var clocks = createClocks(10, 8*6+2);
+  var clocks = createClocks(6, 8*6-1);
+ // window.addEventListener('resize', function() {
+ //   canvas.width = window.innerWidth;
+ //   canvas.height = window.innerHeight;
+ //   clocks = createClocks(6, 8*6-1);
+ // }, false);
 
   function zeroPad(h) {
     return (h < 10) ? ("0" + h) : h;
