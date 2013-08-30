@@ -129,6 +129,7 @@
     originalRadius: 0.0,
     radius: 0.0,
     startRadius: 0.0,
+    endRadius: 0.0,
     difRadius: 0.0,
     tick: function(percentageComplete) {
       var t1 = this.hand1Rad;
@@ -231,15 +232,18 @@
   }
 
   // Create a matrix of clocks
-  function createClocks(yCount, xCount) {
+  function createClocks(yCount, reqXCount) {
     // Split screen up into squares
     var height = canvas.height / yCount;
-    var width = (canvas.width - 20) / xCount;
+    var width = (canvas.width - 20) / reqXCount;
     if(height > width) {
       height = width;
     }
     var radius = height / 2.0;
     var xCount = Math.floor(canvas.width / height);
+    if(xCount > reqXCount) {
+      xCount = reqXCount
+    }
 
     var matrix = [];
     for(var i=0;i<xCount;i++) {
