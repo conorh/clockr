@@ -6,12 +6,12 @@
 
   var characterMap = {
     " ": [
-        ["  ", "  ", "  ", "  ", "  "],
-        ["  ", "  ", "  ", "  ", "  "],
-        ["  ", "  ", "  ", "  ", "  "],
-        ["  ", "  ", "  ", "  ", "  "],
-        ["  ", "  ", "  ", "  ", "  "],
-        ["  ", "  ", "  ", "  ", "  "],
+        ["**", "**", "**", "**", "**"],
+        ["**", "**", "**", "**", "**"],
+        ["**", "**", "**", "**", "**"],
+        ["**", "**", "**", "**", "**"],
+        ["**", "**", "**", "**", "**"],
+        ["**", "**", "**", "**", "**"],
     ],
     ":": [
         ["**", "**", "**", "**", "**"],
@@ -135,12 +135,12 @@
       ],
     "E": [ 
         [",>", "<>", "<>", "<>", "<,"],
-        ["^,", ",>", "<>", "<,", ",^"],
-        ["^,", "^>", "<>", "<^", ",^"],
-        ["^,", ",>", "<>", "<,", ",^"],
-        ["^,", ",^", "**", ",^", ",^"],
-        ["^>", "<^", "**", "^>", "<^"],
-      ],
+        ["^,", ",>", "<>", "<>", "<^"],
+        ["^,", "^>", "<>", "<,", "**"],
+        ["^,", ",>", "<>", "<^", "**"],
+        [",^", "^>", "<>", "<>", "<,"],
+        ["^>", "<>", "<>", "<>", "<^"],
+      ], // done
     "F": [ 
         [",>", "<>", "<>", "<>", "<,"],
         ["^,", ",>", "<>", "<,", ",^"],
@@ -198,13 +198,13 @@
         ["^>", "<^", "**", "^>", "<^"],
       ],
     "M": [ 
-        [",>", "<,", "**", ",>", "<,"],
-        ["^,", ",^", "**", "^,", ",^"],
-        ["^,", "^>", "<>", "<^", ",^"],
-        ["^,", ",>", "<>", "<,", ",^"],
+        [",>", "<\\", "**", "d>", "<,"],
+        ["^,", ",\\", "u/", "d,", ",^"],
+        ["^,", ",^", "u/", ",^", ",^"],
+        ["^,", ",^", "**", ",^", ",^"],
         ["^,", ",^", "**", ",^", ",^"],
         ["^>", "<^", "**", "^>", "<^"],
-      ],
+      ], // done
     "N": [ 
         [",>", "<,", "**", ",>", "<,"],
         ["^,", ",^", "**", "^,", ",^"],
@@ -254,13 +254,13 @@
         ["^>", "<>", "<>", "<>", "<^"]
       ], // done
     "T": [ 
-        [",>", "<,", "**", ",>", "<,"],
-        ["^,", ",^", "**", "^,", ",^"],
-        ["^,", "^>", "<>", "<^", ",^"],
-        ["^,", ",>", "<>", "<,", ",^"],
-        ["^,", ",^", "**", ",^", ",^"],
-        ["^>", "<^", "**", "^>", "<^"],
-      ],
+        [",>", "<>", "<>", "<>", "<,"],
+        ["^>", "<,", "**", ",>", "<^"],
+        ["**", ",^", "**", ",^", "**"],
+        ["**", ",^", "**", ",^", "**"],
+        ["**", ",^", "**", ",^", "**"],
+        ["**", "^>", "<>", "<^", "**"]
+      ], // done
     "U": [ 
         [",>", "<,", "**", ",>", "<,"],
         ["^,", ",^", "**", "^,", ",^"],
@@ -546,7 +546,7 @@
     }
   }
 
-  // Main animation loop, takes 500ms to do one animation
+  // Main animation loop, takes (updateInterval - 500ms) to do one animation
   var animStartTime = 0;
   var cancel = false;
   function animationLoop() {
@@ -588,7 +588,7 @@
   window.addEventListener('resize', setupCanvas, false);
 
   // Every second update the display with the new time
-  function updateTime() {
+  function updateDisplay(message, callback) {
     var now = new Date (new Date().getTime() + updateInterval);
     var seconds = now.getSeconds();
     var hours = now.getHours();
@@ -596,14 +596,26 @@
       hours = " " + hours;
     }
     function zeroPad(h) { return (h < 10) ? ("0" + h) : h; }
-    var timeString = hours + ":" + zeroPad(now.getMinutes()) + ":" + zeroPad(now.getSeconds());
+    var timeString = null;
+    if(typeof(message) == "undefined") {
+      timeString = hours + ":" + zeroPad(now.getMinutes()) + ":" + zeroPad(now.getSeconds());
+    } else {
+      timeString = message;
+    }
     setCharacters(clocks, timeString);
     animStartTime = new Date();
     animationLoop();
+    if(typeof(callback) !== "undefined") {
+      setTimeout(callback, updateInterval);
+    }
   }
 
-  var timer = setInterval(updateTime, updateInterval);
-  updateTime();
+  var timer = null; 
+  updateDisplay("THE TIME", function() {
+    updateDisplay("   IS   ", function() {
+      setInterval(updateDisplay, updateInterval);
+    })
+  });
 
   var e = document.getElementById("update-speed");
   e.addEventListener('change', function(event) {
