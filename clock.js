@@ -611,9 +611,12 @@
   }
 
   var timer = null; 
+  updateInterval = 4000;
   updateDisplay("THE TIME", function() {
     updateDisplay("   IS   ", function() {
-      setInterval(updateDisplay, updateInterval);
+      updateInterval = 2000;
+      updateDisplay();
+      timer = setInterval(updateDisplay, updateInterval);
     })
   });
 
