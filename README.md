@@ -3,7 +3,7 @@ Javascript Canvas Clock of Clocks
 
 A canvas animation of a clock made up of smaller 'clocks'.
 
-see http://squaremill.com/clockr/index.html
+see http://codepen.io/anon/pen/VLVxxX
 
 Originally inspired by http://www.reddit.com/r/gifs/comments/1j9ush/digital_clock_comprised_of_analog_clocks/ which came from http://humanssince1982.com/
 
